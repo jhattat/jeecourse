@@ -14,7 +14,9 @@ public static void main(String[] args) {
 		
 		HttpHandler handler = new HttpHandler(){
 				public void handle(HttpExchange exchange) throws IOException {
-		            byte[] response = "I am the king !".getBytes();
+					
+		            byte[] response = String.format("{\"msg\":\"I am the king !\", \"method\":\"%s\"}",exchange.getRequestMethod()).getBytes();
+		            exchange.getResponseHeaders().add("Content-Type", "text/json; charset=utf-8");
 		            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
 		            exchange.getResponseBody().write(response);
 		            exchange.close();
