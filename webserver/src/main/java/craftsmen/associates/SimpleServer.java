@@ -1,25 +1,36 @@
 package craftsmen.associates;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class SimpleServer {
-	public static void main(String[] args) throws Exception {
-		final ServerSocket serverSocket = new ServerSocket(8111);
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				try {
-					while (true) {
-						new HTTPSession(serverSocket.accept());
-					}
-				} catch (IOException ioe) {
-				}
-			}
-		});
-		t.setDaemon(true);
-		t.start();
-
-		while (true) {
-		}
-	}
+public static void main(String[] args) throws Exception {
+	 ServerSocket ss = new ServerSocket(8111);
+	    while (true) {
+	      Socket s = ss.accept();
+	      PrintStream out = new PrintStream(s.getOutputStream());
+	      BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+	      System.out.println("Reading request ");
+	      String info = null;
+	      while ((info = in.readLine()) != null) {
+	        System.out.println("now got " + info);
+	        if (info.equals(""))
+	          break;
+	      }
+	      System.out.println("Request read ");
+	      out.println("HTTP/1.0 200 OK");
+	      out.println("MIME_version:1.0");
+	      out.println("Content_Type:text/html");
+	      String c = "<html> <head></head><body> <h1> hi</h1></Body></html>";
+	      out.println("Content_Length:" + c.length());
+	      out.println("");
+	      out.println(c);
+	      out.close();
+	      s.close();
+	      in.close();
+}
+}
 }
