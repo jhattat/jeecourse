@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class HTTPSession implements Runnable {
+public class HTTPRequest implements Runnable {
 	private Socket socket;
 
-	public HTTPSession(Socket s) {
+	public HTTPRequest(Socket s) {
 		socket = s;
 		Thread t = new Thread(this);
 		t.setDaemon(true);

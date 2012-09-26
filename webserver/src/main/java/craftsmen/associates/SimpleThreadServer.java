@@ -10,7 +10,7 @@ public class SimpleThreadServer {
 			public void run() {
 				try {
 					while (true) {
-						new HTTPSession(serverSocket.accept());
+						new HTTPRequest(serverSocket.accept());
 					}
 				} catch (IOException ioe) {
 				}
