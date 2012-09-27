@@ -13,7 +13,6 @@ public class SimpleClient {
 		URL url = new URL("http://localhost:8111/");
 		URLConnection conn = openConnection(url);
 		writeInConnection(conn);
-		readFromConnection(conn);
 	}
 
 	private static URLConnection openConnection(URL url) throws IOException {
