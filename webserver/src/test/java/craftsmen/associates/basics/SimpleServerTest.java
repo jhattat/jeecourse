@@ -1,11 +1,10 @@
 package craftsmen.associates.basics;
 
+import static craftsmen.associates.basics.IOUtils.readerToString;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -27,50 +26,29 @@ public class SimpleServerTest {
 		stopServer();
 	}
 
-	private void stopServer() {
-		server.stop();
+	private void whenISendARequest() throws Exception {
+		connection = new URL("http://localhost:"+PORT).openConnection();
+		writeInConnection("GET / HTTP/1.1\n\n");
+	}
+	
+	private void writeInConnection(String httpCommand) throws IOException {
+		connection.setDoOutput(true);
+		try(OutputStream outputStream = connection.getOutputStream()){
+			outputStream.write(httpCommand.getBytes());
+		}
 	}
 
 	private void thenAnswerContains(String answerExpected) throws Exception {
 		assertTrue(readFromConection().contains(answerExpected));
 	}
-
 	private String readFromConection() throws IOException {
 		return readerToString(connection.getInputStream());
 	}
 
-	private static String readerToString(InputStream input)
-			throws IOException {
-		BufferedReader isr2 = new BufferedReader(new InputStreamReader(input));
-		
-		StringBuilder builder = new StringBuilder();
-		String read = "";
-		do{
-			read = isr2.readLine();
-			builder.append(read);
-		}while(isReadable(read));
-		return builder.toString();
+	private void stopServer() {
+		server.stop();
 	}
 
-	private static boolean isReadable(String read) {
-		return (read != null && read.length()>1);
-	}
-
-	private URLConnection whenISendARequest() throws Exception {
-		URL url = new URL("http://localhost:"+PORT);
-		connection = url.openConnection();
-		writeInConnection();
-		
-		return connection;
-	}
-
-	private void writeInConnection() throws IOException {
-		connection.setDoOutput(true);
-		PrintStream printStream = new PrintStream(connection.getOutputStream());
-		printStream.println("GET / HTTP/1.1");
-		printStream.println("");
-		printStream.close();
-	}
 
 	private void whenServerIsLaunched() throws Exception {
 		Executors.newSingleThreadExecutor().execute(server);
