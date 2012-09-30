@@ -7,13 +7,10 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 public class HTTPRequest implements Runnable {
-	private Socket socket;
+    private Socket socket;
 
 	public HTTPRequest(Socket s) {
 		socket = s;
-		Thread t = new Thread(this);
-		t.setDaemon(true);
-		t.start();
 	}
 
 	@Override
@@ -22,7 +19,7 @@ public class HTTPRequest implements Runnable {
 		readRequest(socket);
 		sendResponse(socket);
 		socket.close();
-		}catch(Exception e){
+        }catch(Exception e){
 			System.err.println("Error occurs during request processing");
 		}
 	}
@@ -61,4 +58,10 @@ public class HTTPRequest implements Runnable {
 		System.out.println(currentThreadId+" : Response Sent");
 
 	}
+
+    public void start() {
+        Thread t = new Thread(this);
+        t.setDaemon(true);
+        t.start();
+    }
 }
