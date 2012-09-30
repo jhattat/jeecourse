@@ -1,4 +1,4 @@
-package craftsmen.associates;
+package craftsmen.associates.basics;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

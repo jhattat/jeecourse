@@ -1,4 +1,4 @@
-package craftsmen.associates;
+package craftsmen.associates.basics;
 
 public class GgiTest {
 public static void main(String[] args) {

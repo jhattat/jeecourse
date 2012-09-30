@@ -1,4 +1,4 @@
-package craftsmen.associates;
+package craftsmen.associates.basics;
 
 /*
 "Copyright (C) 2001,2005 by Jarno Elonen <elonen@iki.fi>\n"+
