@@ -8,14 +8,14 @@ import java.io.InputStreamReader;
 public class IOUtils {
 	public static String readerToString(InputStream input) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		try (BufferedReader isr2 = new BufferedReader(new InputStreamReader(
-				input))) {
+		try (BufferedReader isr2 = new BufferedReader(new InputStreamReader(input))) {
 			String read = "";
 			do {
 				read = isr2.readLine();
 				builder.append(read);
 			} while (isReadable(read));
 		}
+		System.out.println(builder);
 		return builder.toString();
 	}
 
