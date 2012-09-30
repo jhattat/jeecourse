@@ -5,25 +5,39 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.Executors;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
 
 public class SimpleServerTest {
 	
 	private static final int PORT = 8111;
-	private SimpleServer server=new SimpleServer(PORT);
 	private URLConnection connection;
 
+	@Rule
+	public ExternalResource rule = new ExternalResource() {
+		private SimpleServer server=new SimpleServer(PORT);
+		@Override
+		protected void before() throws Throwable {
+			Executors.newSingleThreadExecutor().execute(server);			
+		}
+		protected void after() {
+			server.stop();
+		};
+	};
+	
 	@Test
 	public void serverAnswersHi() throws Exception {
-		whenServerIsLaunched();
+		whenAClientRequestTheResponseContains();
+	}
+
+	private void whenAClientRequestTheResponseContains() throws Exception {
 		whenISendARequest();
 		thenAnswerContains("hi");
-		stopServer();
 	}
 
 	private void whenISendARequest() throws Exception {
@@ -45,12 +59,4 @@ public class SimpleServerTest {
 		return readerToString(connection.getInputStream());
 	}
 
-	private void stopServer() {
-		server.stop();
-	}
-
-
-	private void whenServerIsLaunched() throws Exception {
-		Executors.newSingleThreadExecutor().execute(server);
-	}
 }
