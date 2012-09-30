@@ -20,8 +20,7 @@ public class SimpleServer {
 				if (info.equals(""))
 					break;
 			}
-			in.close();
-			
+
 			PrintStream out = new PrintStream(s.getOutputStream());
 			System.out.println("Request read ");
 			out.println("HTTP/1.0 200 OK");
@@ -33,7 +32,8 @@ public class SimpleServer {
 			out.println(c);
 			out.println("");
 			out.close();
-			s.close();
+            in.close();
+            s.close();
 		}
 	}
 }
