@@ -1,15 +1,13 @@
 package craftsmen.associates.basics;
 
-import com.sun.jdi.IntegerType;
-
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 public class MultiThreadedServer {
-    /** Pool de 5+1 thread. */
+    /**
+     * Pool de 5+1 thread.
+     */
     private static final Executor worker = Executors.newFixedThreadPool(6);
 
     public static void mainLoop() {
@@ -31,7 +29,7 @@ public class MultiThreadedServer {
     }
 
     public static void main(String[] args) {
-        worker.execute(new Runnable(){
+        worker.execute(new Runnable() {
             @Override
             public void run() {
                 mainLoop();
