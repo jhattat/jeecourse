@@ -15,7 +15,7 @@ public class SimpleServer {
 	}
 
 
-	private void run() throws IOException {
+	public void run() throws IOException {
 		ServerSocket ss = new ServerSocket(8111);
 		while (!stop) {
 			Socket s = ss.accept();
