@@ -1,15 +1,23 @@
 package craftsmen.associates.basics;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SimpleServer {
+	private boolean stop = false;
+
 	public static void main(String[] args) throws Exception {
+		new SimpleServer().run();
+	}
+
+
+	private void run() throws IOException {
 		ServerSocket ss = new ServerSocket(8111);
-		while (true) {
+		while (!stop) {
 			Socket s = ss.accept();
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					s.getInputStream()));
@@ -35,5 +43,10 @@ public class SimpleServer {
 			out.close();
 			s.close();
 		}
+	}
+
+
+	public void stop() {
+		this.stop = true;
 	}
 }
