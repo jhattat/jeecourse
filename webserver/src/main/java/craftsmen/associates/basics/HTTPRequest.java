@@ -19,20 +19,20 @@ public class HTTPRequest implements Runnable {
 		readRequest(socket);
 		sendResponse(socket);
 		socket.close();
-		}catch(Exception e){
+        }catch(Exception e){
 			System.err.println("Error occurs during request processing");
 		}
 	}
 
 	private void readRequest(Socket s) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		String currentThreadId = Thread.currentThread().getName();
+		long currentThreadId = Thread.currentThread().getId();
 		System.out.println(currentThreadId+" : Reading request");
 		echoInputSream(in, currentThreadId);
 		System.out.println(currentThreadId+" : Request read ");
 	}
 
-	private void echoInputSream(BufferedReader in, String currentThreadId)
+	private void echoInputSream(BufferedReader in, long currentThreadId)
 			throws IOException {
 		String info = null;
 		while ((info = in.readLine()) != null) {

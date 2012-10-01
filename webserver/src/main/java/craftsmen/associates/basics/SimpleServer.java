@@ -1,6 +1,5 @@
 package craftsmen.associates.basics;
 
-import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,13 +26,12 @@ public class SimpleServer implements Runnable {
 	}
 
 	public void run() {
-		try {
-			ServerSocket server = new ServerSocket(port);
+		try (ServerSocket server = new ServerSocket(port)){
 			while (!stop) {
-				try (Socket s = server.accept()) {
-					read(s);
-					write(s);
-				}
+				Socket s = server.accept();
+				read(s);
+				write(s);
+				s.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

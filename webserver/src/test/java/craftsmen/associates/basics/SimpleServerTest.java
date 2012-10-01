@@ -1,6 +1,6 @@
 package craftsmen.associates.basics;
 
-import static craftsmen.associates.basics.IOUtils.readerToString;
+import static craftsmen.associates.utils.IOUtils.readerToString;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
