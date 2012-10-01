@@ -1,4 +1,4 @@
-package craftsmen.associates.basics;
+package craftsmen.associates.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
