@@ -7,13 +7,10 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 public class HTTPRequest implements Runnable {
-	private Socket socket;
+    private Socket socket;
 
 	public HTTPRequest(Socket s) {
 		socket = s;
-		Thread t = new Thread(this);
-		t.setDaemon(true);
-		t.start();
 	}
 
 	@Override
@@ -29,13 +26,13 @@ public class HTTPRequest implements Runnable {
 
 	private void readRequest(Socket s) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		long currentThreadId = Thread.currentThread().getId();
+		String currentThreadId = Thread.currentThread().getName();
 		System.out.println(currentThreadId+" : Reading request");
 		echoInputSream(in, currentThreadId);
 		System.out.println(currentThreadId+" : Request read ");
 	}
 
-	private void echoInputSream(BufferedReader in, long currentThreadId)
+	private void echoInputSream(BufferedReader in, String currentThreadId)
 			throws IOException {
 		String info = null;
 		while ((info = in.readLine()) != null) {
@@ -61,4 +58,10 @@ public class HTTPRequest implements Runnable {
 		System.out.println(currentThreadId+" : Response Sent");
 
 	}
+
+    public void start() {
+        Thread t = new Thread(this);
+        t.setDaemon(true);
+        t.start();
+    }
 }
