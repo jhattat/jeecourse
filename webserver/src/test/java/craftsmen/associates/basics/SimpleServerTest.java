@@ -19,11 +19,19 @@ public class SimpleServerTest {
 	
 	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
-		server = new SimpleServer(PORT);
-		server.launch();
+		whenServerIsRunning();
 		whenISendARequest();
 		thenAnswerContains("hi");
+		stopServer();
+	}
+
+	private void stopServer() {
 		server.stop();
+	}
+
+	private void whenServerIsRunning() {
+		server = new SimpleServer(PORT);
+		server.launch();
 	}
 
 	private void whenISendARequest() throws Exception {
