@@ -31,7 +31,6 @@ public class SimpleServer implements Runnable {
 				Socket s = server.accept();
 				read(s);
 				write(s);
-				s.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

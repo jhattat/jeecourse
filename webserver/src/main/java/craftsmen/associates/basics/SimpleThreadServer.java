@@ -18,8 +18,6 @@ public class SimpleThreadServer {
 		});
 		t.setDaemon(true);
 		t.start();
-
-		while (true) {
-		}
+		while (true) {}
 	}
 }

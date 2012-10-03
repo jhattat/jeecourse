@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Executors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,27 +16,27 @@ public class SimpleServerTest {
 	
 	private static final int PORT = 8111;
 	private URLConnection connection;
+	private SimpleServer server;
 
 	@Rule
 	public ExternalResource rule = new ExternalResource() {
 		private SimpleServer server=new SimpleServer(PORT);
 		@Override
 		protected void before() throws Throwable {
-			Executors.newSingleThreadExecutor().execute(server);			
+			server.run();
 		}
 		protected void after() {
 			server.stop();
 		};
 	};
 	
-	@Test
+	
+	@Test(timeout=20)
 	public void serverAnswersHi() throws Exception {
-		whenAClientRequestTheResponseContains();
-	}
-
-	private void whenAClientRequestTheResponseContains() throws Exception {
+		server = new SimpleServer(PORT);
 		whenISendARequest();
 		thenAnswerContains("hi");
+		server.stop();
 	}
 
 	private void whenISendARequest() throws Exception {
