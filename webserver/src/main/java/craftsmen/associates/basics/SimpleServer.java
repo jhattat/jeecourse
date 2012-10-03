@@ -10,7 +10,7 @@ public class SimpleServer implements Runnable{
 		try {
 			server = new ServerSocket(0);
 			while (!stop) {
-				new HTTPRequest(server.accept()).run();
+				new Thread(new HTTPRequest(server.accept())).start();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
