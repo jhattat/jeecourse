@@ -12,6 +12,7 @@ public class SimpleServer implements Runnable{
 	private static final String HTML_CONTENT = "<html> <head></head><body> <h1> hi</h1></Body></html>";
 	private boolean stop = false;
 	private int port = 8111;
+	private ServerSocket server;
 
 	public SimpleServer() {
 	}
@@ -21,7 +22,8 @@ public class SimpleServer implements Runnable{
 	}
 
 	public void run() {
-		try (ServerSocket server = new ServerSocket(port)){
+		try {
+			server = new ServerSocket(0);
 			while (!stop) {
 				Socket s = server.accept();
 				read(s);
@@ -32,6 +34,10 @@ public class SimpleServer implements Runnable{
 		}
 	}
 
+	int getPort(){
+		return server.getLocalPort();
+	}
+	
 	private void write(Socket s) throws IOException {
 		PrintStream out = new PrintStream(s.getOutputStream());
 		System.out.println("Request read ");

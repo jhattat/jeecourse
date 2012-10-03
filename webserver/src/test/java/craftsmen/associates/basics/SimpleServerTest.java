@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.Executors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class SimpleServerTest {
@@ -16,25 +18,29 @@ public class SimpleServerTest {
 	private static final int PORT = 8111;
 	private SimpleServer server;
 	
+	@Before
+	public void setUp(){
+		System.err.println("Launchin the server...");
+		server = new SimpleServer();
+		Executors.newSingleThreadExecutor().execute(server);
+		System.err.println("Launched");
+	}
+
+	@After
+	public void tearDown() throws Exception{
+		System.err.println("Stoping the server...");
+		server.stop();
+		System.err.println("Stopped");
+	}
+	
 	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
-		whenServerIsRunning();
 		URLConnection connection = whenISendARequest();
 		thenAnswerContains(connection, "hi");
-		stopServer();
-	}
-
-	private void stopServer() {
-		server.stop();
-	}
-
-	private void whenServerIsRunning() {
-		server = new SimpleServer(PORT);
-		Executors.newSingleThreadExecutor().execute(server);
 	}
 
 	private URLConnection whenISendARequest() throws Exception {
-		URLConnection connection  = new URL("http://localhost:"+PORT).openConnection();
+		URLConnection connection  = new URL("http://localhost:"+server.getPort()).openConnection();
 		writeInConnection("GET / HTTP/1.1\n\n", connection);
 		return connection;
 	}
@@ -55,12 +61,14 @@ public class SimpleServerTest {
 
 	@Test(timeout=5000)
 	public void serverAnswersHiAtEachRequest() throws Exception {
-		whenServerIsRunning();
 		URLConnection connection = whenISendARequest();
 		thenAnswerContains(connection,"hi");
+		
 		URLConnection connection2 = whenISendARequest();
 		thenAnswerContains(connection2,"hi");
-		stopServer();
+
+		URLConnection connection3 = whenISendARequest();
+		thenAnswerContains(connection3,"hi");
 	}
 	
 }
