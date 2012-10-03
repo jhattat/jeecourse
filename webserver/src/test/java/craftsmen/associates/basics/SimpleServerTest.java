@@ -14,15 +14,13 @@ import org.junit.Test;
 public class SimpleServerTest {
 	
 	private static final int PORT = 8111;
-	private URLConnection connection;
 	private SimpleServer server;
-	
 	
 	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
 		whenServerIsRunning();
-		whenISendARequest();
-		thenAnswerContains("hi");
+		URLConnection connection = whenISendARequest();
+		thenAnswerContains(connection, "hi");
 		stopServer();
 	}
 
@@ -35,23 +33,34 @@ public class SimpleServerTest {
 		Executors.newSingleThreadExecutor().execute(server);
 	}
 
-	private void whenISendARequest() throws Exception {
-		connection = new URL("http://localhost:"+PORT).openConnection();
-		writeInConnection("GET / HTTP/1.1\n\n");
+	private URLConnection whenISendARequest() throws Exception {
+		URLConnection connection  = new URL("http://localhost:"+PORT).openConnection();
+		writeInConnection("GET / HTTP/1.1\n\n", connection);
+		return connection;
 	}
 	
-	private void writeInConnection(String httpCommand) throws IOException {
+	private void writeInConnection(String httpCommand, URLConnection connection) throws IOException {
 		connection.setDoOutput(true);
 		try(OutputStream outputStream = connection.getOutputStream()){
 			outputStream.write(httpCommand.getBytes());
 		}
 	}
 
-	private void thenAnswerContains(String answerExpected) throws Exception {
-		assertTrue(readFromConection().contains(answerExpected));
+	private void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
+		assertTrue(readFromConection(connection).contains(answerExpected));
 	}
-	private String readFromConection() throws IOException {
+	private String readFromConection(URLConnection connection) throws IOException {
 		return readerToString(connection.getInputStream());
 	}
 
+	@Test(timeout=5000)
+	public void serverAnswersHiAtEachRequest() throws Exception {
+		whenServerIsRunning();
+		URLConnection connection = whenISendARequest();
+		thenAnswerContains(connection,"hi");
+		URLConnection connection2 = whenISendARequest();
+		thenAnswerContains(connection2,"hi");
+		stopServer();
+	}
+	
 }
