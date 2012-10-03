@@ -20,7 +20,7 @@ public class SimpleServerTest {
 	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
 		server = new SimpleServer(PORT);
-		server.run();
+		server.launch();
 		whenISendARequest();
 		thenAnswerContains("hi");
 		server.stop();

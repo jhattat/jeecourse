@@ -6,9 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executors;
 
-public class SimpleServer implements Runnable {
+public class SimpleServer {
 	private static final String HTML_HEADER = "HTTP/1.0 200 OK\nMIME_version:1.0\nContent_Type:text/html\n";
 	private static final String HTML_CONTENT = "<html> <head></head><body> <h1> hi</h1></Body></html>";
 	private boolean stop = false;
@@ -21,11 +20,7 @@ public class SimpleServer implements Runnable {
 		this.port = port;
 	}
 
-	public static void main(String[] args) throws Exception {
-		Executors.newSingleThreadExecutor().execute(new SimpleServer());
-	}
-
-	public void run() {
+	public void launch() {
 		try (ServerSocket server = new ServerSocket(port)){
 			while (!stop) {
 				Socket s = server.accept();
