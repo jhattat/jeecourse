@@ -8,32 +8,19 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 
 public class SimpleServerTest {
 	
 	private static final int PORT = 8111;
 	private URLConnection connection;
 	private SimpleServer server;
-
-	@Rule
-	public ExternalResource rule = new ExternalResource() {
-		private SimpleServer server=new SimpleServer(PORT);
-		@Override
-		protected void before() throws Throwable {
-			server.run();
-		}
-		protected void after() {
-			server.stop();
-		};
-	};
 	
 	
-	@Test(timeout=20)
+	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
 		server = new SimpleServer(PORT);
+		server.run();
 		whenISendARequest();
 		thenAnswerContains("hi");
 		server.stop();
