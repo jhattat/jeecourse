@@ -40,7 +40,7 @@ public class SimpleServer implements Runnable{
 	
 	private void write(Socket s) throws IOException {
 		PrintStream out = new PrintStream(s.getOutputStream());
-		System.out.println("Request read ");
+		System.out.println(Thread.currentThread().getName()+" writing response ");
 		out.print(HTML_HEADER);
 		String c = HTML_CONTENT;
 		out.println("Content_Length:" + c.length());
@@ -50,10 +50,10 @@ public class SimpleServer implements Runnable{
 
 	private void read(Socket s) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		System.out.println("Reading request ");
+		System.out.println(Thread.currentThread().getName()+" reading request");
 		String info = null;
 		while ((info = in.readLine()) != null) {
-			System.out.println("now got " + info);
+			System.out.println(Thread.currentThread().getName()+"now got " + info);
 			if (info.equals(""))
 				break;
 		}
