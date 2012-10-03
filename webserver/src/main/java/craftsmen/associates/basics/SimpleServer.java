@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class SimpleServer {
+public class SimpleServer implements Runnable{
 	private static final String HTML_HEADER = "HTTP/1.0 200 OK\nMIME_version:1.0\nContent_Type:text/html\n";
 	private static final String HTML_CONTENT = "<html> <head></head><body> <h1> hi</h1></Body></html>";
 	private boolean stop = false;
@@ -20,7 +20,7 @@ public class SimpleServer {
 		this.port = port;
 	}
 
-	public void launch() {
+	public void run() {
 		try (ServerSocket server = new ServerSocket(port)){
 			while (!stop) {
 				Socket s = server.accept();

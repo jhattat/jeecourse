@@ -31,7 +31,7 @@ public class SimpleServerTest {
 
 	private void whenServerIsRunning() {
 		server = new SimpleServer(PORT);
-		server.launch();
+		new Thread(server).start();
 	}
 
 	private void whenISendARequest() throws Exception {
