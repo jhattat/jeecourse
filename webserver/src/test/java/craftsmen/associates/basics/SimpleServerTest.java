@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.Executors;
 
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class SimpleServerTest {
 
 	private void whenServerIsRunning() {
 		server = new SimpleServer(PORT);
-		new Thread(server).start();
+		Executors.newSingleThreadExecutor().execute(server);
 	}
 
 	private void whenISendARequest() throws Exception {
