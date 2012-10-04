@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,6 +17,19 @@ import org.junit.Test;
 
 public class SimpleServerTest {
 	
+	private static final class Worker implements Runnable {
+		@Override
+		public void run() {
+			URLConnection connection;
+			try {
+				connection = whenISendARequest();
+				thenAnswerContains(connection,"hi");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private static final int PORT = 8111;
 	private SimpleServer server;
 	
@@ -63,22 +77,11 @@ public class SimpleServerTest {
 
 	@Test//(timeout=7000)
 	public void serverAnswersHiAtEachRequest() throws Exception {
-		Runnable runable = new Runnable() {
-			@Override
-			public void run() {
-				URLConnection connection;
-				try {
-					connection = whenISendARequest();
-					thenAnswerContains(connection,"hi");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};
 		System.err.println("LAUNCHING REQUEST");
 		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(5);
 		for(int i=0; i<10 ; i++){
-			newCachedThreadPool.execute(runable);
+			newCachedThreadPool.execute(new Worker());
+			
 		}
 		// ugly waiting for end
 		Thread.sleep(5000);
