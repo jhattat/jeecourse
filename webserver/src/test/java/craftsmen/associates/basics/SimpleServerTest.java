@@ -17,17 +17,50 @@ import org.junit.Test;
 
 public class SimpleServerTest {
 	
+	
 	private static final class Worker implements Runnable {
+		CountDownLatch startSignal;
+		CountDownLatch stopSignal;
+		int port;
+		
+		public Worker(CountDownLatch start,CountDownLatch stop, int port) {
+			this.startSignal = start;
+			this.stopSignal = stop;
+			this.port = port;
+		}
+
 		@Override
 		public void run() {
-			URLConnection connection;
 			try {
+				startSignal.await();
+				URLConnection connection;
 				connection = whenISendARequest();
 				thenAnswerContains(connection,"hi");
+				stopSignal.countDown();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		public URLConnection whenISendARequest() throws Exception {
+			URLConnection connection  = new URL("http://localhost:"+port).openConnection();
+			writeInConnection("GET / HTTP/1.1\n\n", connection);
+			return connection;
+		}
+		
+		private void writeInConnection(String httpCommand, URLConnection connection) throws IOException {
+			connection.setDoOutput(true);
+			try(OutputStream outputStream = connection.getOutputStream()){
+				outputStream.write(httpCommand.getBytes());
+			}
+		}
+
+		private void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
+			assertTrue(readFromConection(connection).contains(answerExpected));
+		}
+		private String readFromConection(URLConnection connection) throws IOException {
+			return readerToString(connection.getInputStream());
+		}
+
 	}
 
 	private static final int PORT = 8111;
@@ -79,12 +112,13 @@ public class SimpleServerTest {
 	public void serverAnswersHiAtEachRequest() throws Exception {
 		System.err.println("LAUNCHING REQUEST");
 		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(5);
+		CountDownLatch startSignal= new CountDownLatch(1);
+		CountDownLatch stopSignal= new CountDownLatch(10);
 		for(int i=0; i<10 ; i++){
-			newCachedThreadPool.execute(new Worker());
-			
+			newCachedThreadPool.execute(new Worker(startSignal,stopSignal, server.getPort()));
 		}
-		// ugly waiting for end
-		Thread.sleep(5000);
+		startSignal.countDown(); // all are waiting for that !
+		stopSignal.await();
 	}
 	
 }
