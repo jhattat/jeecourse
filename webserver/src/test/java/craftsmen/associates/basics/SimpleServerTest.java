@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.After;
@@ -39,7 +40,7 @@ public class SimpleServerTest {
 		thenAnswerContains(connection, "hi");
 	}
 
-	private URLConnection whenISendARequest() throws Exception {
+	public URLConnection whenISendARequest() throws Exception {
 		URLConnection connection  = new URL("http://localhost:"+server.getPort()).openConnection();
 		writeInConnection("GET / HTTP/1.1\n\n", connection);
 		return connection;
@@ -55,20 +56,32 @@ public class SimpleServerTest {
 	private void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
 		assertTrue(readFromConection(connection).contains(answerExpected));
 	}
+	
 	private String readFromConection(URLConnection connection) throws IOException {
 		return readerToString(connection.getInputStream());
 	}
 
-	@Test(timeout=5000)
+	@Test//(timeout=7000)
 	public void serverAnswersHiAtEachRequest() throws Exception {
-		URLConnection connection = whenISendARequest();
-		thenAnswerContains(connection,"hi");
-		
-		URLConnection connection2 = whenISendARequest();
-		thenAnswerContains(connection2,"hi");
-
-		URLConnection connection3 = whenISendARequest();
-		thenAnswerContains(connection3,"hi");
+		Runnable runable = new Runnable() {
+			@Override
+			public void run() {
+				URLConnection connection;
+				try {
+					connection = whenISendARequest();
+					thenAnswerContains(connection,"hi");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		System.err.println("LAUNCHING REQUEST");
+		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(5);
+		for(int i=0; i<10 ; i++){
+			newCachedThreadPool.execute(runable);
+		}
+		// ugly waiting for end
+		Thread.sleep(5000);
 	}
 	
 }

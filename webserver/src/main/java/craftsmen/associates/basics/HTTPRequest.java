@@ -28,7 +28,7 @@ public class HTTPRequest implements Runnable {
 	private void longWork() {
 		int random =(int) (Math.random()*5000);
 		try {
-			System.out.println("Sleeping for... "+random);
+			System.out.println(Thread.currentThread().getId() + " is sleeping for... "+random);
 			Thread.sleep(random); // less than 0,5seconds
 		} catch (InterruptedException e) {
 			e.printStackTrace();
