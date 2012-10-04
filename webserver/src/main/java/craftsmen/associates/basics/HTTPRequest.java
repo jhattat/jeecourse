@@ -17,11 +17,22 @@ public class HTTPRequest implements Runnable {
 	public void run() {
 		try{
 		readRequest(socket);
+		longWork();
 		sendResponse(socket);
 		socket.close();
         }catch(Exception e){
 			System.err.println("Error occurs during request processing");
 		}
+	}
+
+	private void longWork() {
+		int random =(int) (Math.random()*5000);
+		try {
+			System.out.println("Sleeping for... "+random);
+			Thread.sleep(random); // less than 0,5seconds
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} 
 	}
 
 	private void readRequest(Socket s) throws IOException {
