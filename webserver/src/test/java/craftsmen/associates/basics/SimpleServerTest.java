@@ -41,6 +41,7 @@ public class SimpleServerTest {
 				e.printStackTrace();
 			}
 		}
+
 		public URLConnection whenISendARequest() throws Exception {
 			URLConnection connection  = new URL("http://localhost:"+port).openConnection();
 			writeInConnection("GET / HTTP/1.1\n\n", connection);
