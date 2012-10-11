@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 public class HTTPRequest implements Runnable {
-    private Socket socket;
+	private Socket socket;
 
 	public HTTPRequest(Socket s) {
 		socket = s;
@@ -15,47 +15,50 @@ public class HTTPRequest implements Runnable {
 
 	@Override
 	public void run() {
-		try{
-		readRequest(socket);
-		longWork();
-		sendResponse(socket);
-		socket.close();
-        }catch(Exception e){
+		try {
+			System.out.println("HttpRequest Launched");
+			readRequest(socket);
+			sendResponse(socket);
+			socket.close();
+		} catch (Exception e) {
 			System.err.println("Error occurs during request processing");
 		}
 	}
 
-	private void longWork() {
-		int random =(int) (Math.random()*5000);
-		try {
-			System.out.println(Thread.currentThread().getId() + " is sleeping for... "+random);
-			Thread.sleep(random); // less than 0,5seconds
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} 
-	}
-
 	private void readRequest(Socket s) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+				s.getInputStream()));
 		long currentThreadId = Thread.currentThread().getId();
-		System.out.println(currentThreadId+" : Reading request");
+		System.out.println(currentThreadId + " : Reading request");
 		echoInputSream(in, currentThreadId);
-		System.out.println(currentThreadId+" : Request read ");
+		System.out.println(currentThreadId + " : Request read ");
 	}
 
 	private void echoInputSream(BufferedReader in, long currentThreadId)
 			throws IOException {
 		String info = null;
+		boolean noContent = true;
 		while ((info = in.readLine()) != null) {
-			System.out.println(currentThreadId+" : "+info);
-			if (info.equals(""))
+			System.out.println(currentThreadId + " : " + info);
+			if(info.startsWith("Content-Length: ")){
+				String content = info.substring("Content-Length: ".length());
+				in.readLine(); // saut de ligne
+				String timeToWork = in.readLine();
+				try {
+					Thread.sleep(Long.valueOf(timeToWork));
+				} catch (NumberFormatException | InterruptedException e) {
+					e.printStackTrace();
+				}
+				noContent=false;
+			}
+		if (info.equals("") & !noContent)
 				break;
 		}
 	}
 
 	private void sendResponse(Socket s) throws IOException {
 		long currentThreadId = Thread.currentThread().getId();
-		System.out.println(currentThreadId+" : Sending response");
+		System.out.println("HttpRequest response "+ currentThreadId + " : Sending response");
 
 		PrintStream out = new PrintStream(s.getOutputStream());
 		out.println("HTTP/1.0 200 OK");
@@ -66,13 +69,13 @@ public class HTTPRequest implements Runnable {
 		out.println("");
 		out.println(c);
 		out.close();
-		System.out.println(currentThreadId+" : Response Sent");
+		System.out.println("HttpRequest response "+currentThreadId + " : Response Sent");
 
 	}
 
-    public void start() {
-        Thread t = new Thread(this);
-        t.setDaemon(true);
-        t.start();
-    }
+	public void start() {
+		Thread t = new Thread(this);
+		t.setDaemon(true);
+		t.start();
+	}
 }

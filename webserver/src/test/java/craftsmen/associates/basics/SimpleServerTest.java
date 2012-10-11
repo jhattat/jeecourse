@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,10 +19,10 @@ import org.junit.Test;
 public class SimpleServerTest {
 	
 	
-	private static final class Worker implements Runnable {
+	private static final class Worker extends SimpleServerTest implements Runnable {
 		CountDownLatch startSignal;
 		CountDownLatch stopSignal;
-		int port;
+		private int port;
 		
 		public Worker(CountDownLatch start,CountDownLatch stop, int port) {
 			this.startSignal = start;
@@ -34,7 +35,7 @@ public class SimpleServerTest {
 			try {
 				startSignal.await();
 				URLConnection connection;
-				connection = whenISendARequest();
+				connection = whenISendARequest(port);
 				thenAnswerContains(connection,"hi");
 				stopSignal.countDown();
 			} catch (Exception e) {
@@ -42,29 +43,8 @@ public class SimpleServerTest {
 			}
 		}
 
-		public URLConnection whenISendARequest() throws Exception {
-			URLConnection connection  = new URL("http://localhost:"+port).openConnection();
-			writeInConnection("GET / HTTP/1.1\n\n", connection);
-			return connection;
-		}
-		
-		private void writeInConnection(String httpCommand, URLConnection connection) throws IOException {
-			connection.setDoOutput(true);
-			try(OutputStream outputStream = connection.getOutputStream()){
-				outputStream.write(httpCommand.getBytes());
-			}
-		}
-
-		private void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
-			assertTrue(readFromConection(connection).contains(answerExpected));
-		}
-		private String readFromConection(URLConnection connection) throws IOException {
-			return readerToString(connection.getInputStream());
-		}
-
 	}
 
-	private static final int PORT = 8111;
 	private SimpleServer server;
 	
 	@Before
@@ -82,36 +62,38 @@ public class SimpleServerTest {
 		System.err.println("Stopped");
 	}
 	
-	@Test(timeout=5000)
+	@Test(timeout=50000)
 	public void serverAnswersHi() throws Exception {
-		URLConnection connection = whenISendARequest();
+		URLConnection connection = whenISendARequest(server.getPort());
 		thenAnswerContains(connection, "hi");
 	}
 
-	public URLConnection whenISendARequest() throws Exception {
-		URLConnection connection  = new URL("http://localhost:"+server.getPort()).openConnection();
-		writeInConnection("GET / HTTP/1.1\n\n", connection);
+	public URLConnection whenISendARequest(int port) throws Exception {
+		System.err.println("Client "+Thread.currentThread().getId()+" launched a request");
+		URLConnection connection  = new URL("http://localhost:"+port).openConnection();
+		int random =new Random().nextInt(1001);
+		String parameters = String.format("time=%d",random);
+		writeInConnection(String.format("POST / HTTP/1.1\n\nContent-Length: %d\n\n%s\n",parameters.length(), parameters), connection);
 		return connection;
 	}
 	
-	private void writeInConnection(String httpCommand, URLConnection connection) throws IOException {
+	public void writeInConnection(String httpCommand, URLConnection connection) throws IOException {
 		connection.setDoOutput(true);
 		try(OutputStream outputStream = connection.getOutputStream()){
 			outputStream.write(httpCommand.getBytes());
 		}
 	}
 
-	private void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
+	public void thenAnswerContains(URLConnection connection,String answerExpected) throws Exception {
+		System.out.println("Client"+Thread.currentThread().getId()+" is reading request" );
 		assertTrue(readFromConection(connection).contains(answerExpected));
 	}
-	
-	private String readFromConection(URLConnection connection) throws IOException {
+	public String readFromConection(URLConnection connection) throws IOException {
 		return readerToString(connection.getInputStream());
 	}
 
-	@Test//(timeout=7000)
+	@Test
 	public void serverAnswersHiAtEachRequest() throws Exception {
-		System.err.println("LAUNCHING REQUEST");
 		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(5);
 		CountDownLatch startSignal= new CountDownLatch(1);
 		CountDownLatch stopSignal= new CountDownLatch(10);
