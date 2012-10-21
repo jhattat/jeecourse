@@ -62,7 +62,7 @@ public class SimpleServerTest {
 		System.err.println("Stopped");
 	}
 	
-	@Test(timeout=50000)
+	@Test(timeout=5000)
 	public void serverAnswersHi() throws Exception {
 		URLConnection connection = whenISendARequest(server.getPort());
 		thenAnswerContains(connection, "hi");
@@ -92,7 +92,7 @@ public class SimpleServerTest {
 		return readerToString(connection.getInputStream());
 	}
 
-	@Test
+	@Test(timeout=300)
 	public void serverAnswersHiAtEachRequest() throws Exception {
 		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(5);
 		CountDownLatch startSignal= new CountDownLatch(1);
